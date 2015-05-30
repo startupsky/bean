@@ -1,0 +1,76 @@
+1. 创建游戏接口
+URL: /game/create
+Params: 
+    player_id=123
+    game_name=李峰的游戏 
+    max_players=10
+    longitude_1=117
+    latitude_1=34
+    longitude_2=119
+    latitude_2=45
+
+Return: 
+{
+     "errno": 0,
+     "errmsg": "",
+     "gid": 100
+}
+     
+2. 游戏查询接口
+URL: /game/queryall
+Params: 
+    player_id=123
+    longitude=117
+    latitude=34
+
+Return: 
+{
+     "errno": 0,
+     "errmsg": "",
+     "games": [
+        {
+          "gid": 123,
+          "name": 李峰的游戏
+          "players": 5
+          "max_players": 10
+          "rectangle": [117,34,119,58]
+        }
+        {
+          "gid": 456,
+          "name": 杭晨的游戏
+          "players": 10
+          "max_players": 10
+          "rectangle": [117,34,119,58]
+        }
+     ]
+}
+
+3. join game 接口
+URL: /game/join
+Params: 
+    player_id=123
+    gid=123
+    longitude=117
+    latitude=34
+
+Return: 
+{
+     "errno": 0,
+     "errmsg": ""
+     "players":
+     [
+     {
+         "id": 1,
+         "name": "杭晨",
+         longitude=117,
+         latitude=34
+
+     },
+     {
+         "id": 2,
+         "name": "李峰",
+         longitude=117,
+         latitude=34
+     }
+     ]
+}
