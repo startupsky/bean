@@ -1,11 +1,21 @@
-export GOPATH:=$(GOPATH):$(CURDIR)
+GOPATH:=$(CURDIR)/.godeps:$(CURDIR)
+export GOPATH
 
-all: dep
-	go install main
+target: dep
+	go build -o ./bin/bean ./src/bean/...
+
+debug: dep 
+	go build -gcflags "-N -l" -o ./bin/bean ./src/bean/...
 
 dep:
-	go get github.com/nporsche/goyaml
+	-mkdir .godeps
 	go get github.com/nporsche/np-golang-logging
+	go get github.com/nporsche/goyaml
+
+.PHONY: clean test
 
 clean:
-	-rm -rf ./bin
+	rm -rf bin pkg
+
+test:
+	go test protocol -v
