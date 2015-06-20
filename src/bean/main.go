@@ -3,6 +3,7 @@ package main
 import (
 	"flag"
 	"fmt"
+	"game"
 	"github.com/nporsche/np-golang-logging"
 	"log/syslog"
 	"os"
@@ -31,8 +32,7 @@ func main() {
 		logging.SetLevel(logLevel, "protocol")
 	}
 
-	processor := NewRequestProcessor(NewRequestHandler(*path))
-	svr := NewServer(*pUnixSock, &protocol.Protocol{}, processor)
+	svr := game.NewServer(*pPort, &protocol.Protocol{})
 	svr.Start()
 	return
 }
