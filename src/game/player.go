@@ -12,7 +12,7 @@ const (
 )
 
 type Player struct {
-	id          int64
+	id          uint64
 	passwd      string
 	displayName string
 	conn        net.Conn
@@ -21,7 +21,7 @@ type Player struct {
 	parent      *PlayerManager
 }
 
-func NewPlayer(id int64, passwd, displayName string, conn net.Conn, parent *PlayerManager) *Player {
+func NewPlayer(id uint64, passwd, displayName string, conn net.Conn, parent *PlayerManager) *Player {
 	this := new(Player)
 	this.id = id
 	this.displayName = displayName

@@ -26,3 +26,5 @@ type BeanError struct {
 func (this *BeanError) Error() string {
 	return fmt.Sprint(this.ErrNo, this.ErrMsg)
 }
+
+var GamePlayersFullError = &BeanError{1, "Game Players Full"}

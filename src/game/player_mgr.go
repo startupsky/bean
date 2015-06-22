@@ -24,7 +24,7 @@ func (this *PlayerManager) Login(conn net.Conn) (player *Player, err error) {
 	proto := this.parent.parent.proto
 	if cmd, err := proto.ReadCommand(bufio.NewReader(conn)); err == nil {
 		if cmd.CommandID == CMDLOGIN && len(cmd.Arguments) == 2 {
-			id, _ := strconv.ParseInt(cmd.Arguments[0], 10, 64)
+			id, _ := strconv.ParseUint(cmd.Arguments[0], 10, 64)
 			passwd := cmd.Arguments[1]
 			//valid logic here
 
