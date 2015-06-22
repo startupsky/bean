@@ -32,7 +32,7 @@ func (this *PlayerManager) Login(conn net.Conn) (player *Player, err error) {
 			resp.ErrNo = ErrOK
 			resp.Data = []string{"1"}
 			if _, err := conn.Write(resp.Serialize()); err == nil {
-				player = &Player{id, passwd, "display", conn, loginStat}
+				player = NewPlayer(id, passwd, "dislay name", conn, this)
 				this.onlinePlayers = append(this.onlinePlayers, player)
 				return player, nil
 			}

@@ -5,9 +5,8 @@ import (
 )
 
 const (
-	ErrOK         = int16(0)
-	ErrInternal   = int16(1)
-	ErrUnExpected = int16(2)
+	ErrOK     = int16(0)
+	ErrFormat = int16(1)
 )
 
 const (
