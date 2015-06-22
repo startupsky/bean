@@ -64,7 +64,7 @@ func (this *Protocol) CreateEvent() *Event {
 
 func (this *Event) Serialize() []byte {
 	buf := new(bytes.Buffer)
-	buf.WriteString(fmt.Sprintf("%s %d\r\n", this.EventID, len(this.Data)))
+	buf.WriteString(fmt.Sprintf("*%s %d\r\n", this.EventID, len(this.Data)))
 	for _, d := range this.Data {
 		buf.WriteString(fmt.Sprintf("%s\r\n", d))
 	}

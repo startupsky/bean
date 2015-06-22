@@ -32,7 +32,7 @@ func (this *GameManager) CreateGame(maxPlayers int, cityId int, rect geo.Rectang
 	g.Rect = rect
 	g.State = gameWaiting
 	this.games[g.Id] = g
-	return g, ErrOK
+	return g, nil
 }
 
 func (this *GameManager) JoinGame(player *Player, game *Game) error {

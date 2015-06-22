@@ -1,6 +1,7 @@
 package game
 
 import (
+	"fmt"
 	"github.com/nporsche/np-golang-logging"
 	"net"
 	"protocol"
@@ -23,7 +24,7 @@ func NewServer(port int, proto *protocol.Protocol) *Server {
 
 func (this *Server) Start() {
 	container := NewContainer(this)
-	ls, err := net.Listen("tcp", ":8081")
+	ls, err := net.Listen("tcp", fmt.Sprintf(":%d", this.port))
 	if err != nil {
 		log.Critical("Listen Error=[%s]", err.Error())
 		return
@@ -51,5 +52,6 @@ func (this *Server) handleConnection(conn net.Conn, container *Container) {
 		log.Warning("Login failed from=[%v], err=[%s]", conn.RemoteAddr().String(), err.Error())
 	} else {
 		player.DoWork()
+		playerMgr.Logout(player)
 	}
 }

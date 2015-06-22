@@ -5,6 +5,12 @@ import (
 )
 
 const (
+	ErrOK         = int16(0)
+	ErrInternal   = int16(1)
+	ErrUnExpected = int16(2)
+)
+
+const (
 	gameWaiting = iota
 	gameStarted
 )
@@ -21,6 +27,3 @@ type BeanError struct {
 func (this *BeanError) Error() string {
 	return fmt.Sprint(this.ErrNo, this.ErrMsg)
 }
-
-var ErrOK = &BeanError{0, ""}
-var ErrLogin = &BeanError{1, "Login Error"}

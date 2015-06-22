@@ -3,32 +3,44 @@ package game
 import (
 	"bufio"
 	"net"
+	"strconv"
+	"util"
 )
 
 type PlayerManager struct {
-	parent  *Container
-	players []*Player
+	parent        *Container
+	onlinePlayers util.BeanSlice
 }
 
 func NewPlayerManager(parent *Container) *PlayerManager {
 	this := new(PlayerManager)
-	this.players = []*Player{}
+	this.onlinePlayers = util.BeanSlice{}
 	this.parent = parent
 
 	return this
 }
 
 func (this *PlayerManager) Login(conn net.Conn) (player *Player, err error) {
-	rw := bufio.NewReadWriter(bufio.NewReader(conn), bufio.NewWriter(conn))
-	if cmd, err := this.parent.parent.proto.ReadCommand(rw); err == nil {
+	proto := this.parent.parent.proto
+	if cmd, err := proto.ReadCommand(bufio.NewReader(conn)); err == nil {
 		if cmd.CommandID == CMDLOGIN && len(cmd.Arguments) == 2 {
-			name := cmd.Arguments[0]
+			id, _ := strconv.ParseInt(cmd.Arguments[0], 10, 64)
 			passwd := cmd.Arguments[1]
+			//valid logic here
+
+			resp := proto.CreateResponse()
+			resp.ErrNo = ErrOK
+			resp.Data = []string{"1"}
+			if _, err := conn.Write(resp.Serialize()); err == nil {
+				player = &Player{id, passwd, "display", conn, loginStat}
+				this.onlinePlayers = append(this.onlinePlayers, player)
+				return player, nil
+			}
 		}
 	}
 	return nil, nil
 }
 
 func (this *PlayerManager) Logout(player *Player) {
-
+	this.onlinePlayers = this.onlinePlayers.Remove(player)
 }
