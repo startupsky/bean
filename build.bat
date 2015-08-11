@@ -1,0 +1,3 @@
+@echo off
+SET GOPATH=%cd%/.godeps;%cd%
+go build -o ./bin/bean.exe ./src/bean/...
