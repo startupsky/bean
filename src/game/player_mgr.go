@@ -42,6 +42,7 @@ func (this *PlayerManager) Login(conn net.Conn) (player *Player, err error) {
 			if user == nil{
 				resp.ErrNo = ErrFormat
 				resp.Data = []string{"0"}
+				conn.Write(resp.Serialize())
 			}else{
 				resp.ErrNo = ErrOK
 				resp.Data = []string{"1"}
