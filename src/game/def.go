@@ -16,6 +16,9 @@ const (
 
 const (
 	CMDLOGIN = "login"
+	CREATEGAME = "creategame"
+	LISTGAME = "listgame"
+	JOINGAME = "joingame"
 )
 
 type BeanError struct {
@@ -28,3 +31,4 @@ func (this *BeanError) Error() string {
 }
 
 var GamePlayersFullError = &BeanError{1, "Game Players Full"}
+var GameNotFoundError = &BeanError{2, "Game Not Found"}

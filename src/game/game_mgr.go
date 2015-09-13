@@ -24,9 +24,10 @@ func (this *GameManager) getNewId() uint64 {
 	return id
 }
 
-func (this *GameManager) CreateGame(host *Player, maxPlayers int, cityId int, rect geo.Rectangle) (game *Game) {
+func (this *GameManager) CreateGame(host *Player, name string, maxPlayers int, cityId int, rect geo.Rectangle) (game *Game) {
 	g := new(Game)
 	g.Id = this.getNewId()
+	g.Name = name
 	g.MaxPlayers = maxPlayers
 	g.City = cityId
 	g.Rect = rect
@@ -50,11 +51,16 @@ func (this *GameManager) ListGame(cityId int) []*Game {
 	return cityGames
 }
 
-func (this *GameManager) JoinGame(player *Player, game *Game) error {
-	if game.MaxPlayers == len(game.Players)+1 { //including host
-		return GamePlayersFullError
+func (this *GameManager) JoinGame(player *Player, gameId uint64) error {
+	for _, game := range this.onlineGames {
+		if game.Id == gameId {
+			if game.MaxPlayers == len(game.Players)+1 { //including host
+				return GamePlayersFullError
+			}
+			game.Players[player.id] = player
+			log.Debug("Player=%v Join the Game=%v", player, game)
+			return nil
+		}
 	}
-	game.Players[player.id] = player
-	log.Debug("Player=%v Join the Game=%v", player, game)
-	return nil
+	return GameNotFoundError
 }

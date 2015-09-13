@@ -48,10 +48,11 @@ func (this *Server) handleConnection(conn net.Conn, container *Container) {
 	}()
 	log.Debug("A new connection comes")
 	playerMgr := container.GetPlayerMgr()
+	gameMgr := container.GetGameMgr()
 	if player, err := playerMgr.Login(conn); err != nil {
 		log.Warning("Login failed from=[%v], err=[%s]", conn.RemoteAddr().String(), err.Error())
 	} else {
-		player.DoWork()
+		player.DoWork(gameMgr)
 		playerMgr.Logout(player)
 	}
 }
