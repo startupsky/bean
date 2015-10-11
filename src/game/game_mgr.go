@@ -43,7 +43,7 @@ func (this *GameManager) CreateGame(host *Player, name string, maxPlayers int, c
 func (this *GameManager) ListGame(cityId int) []*Game {
 	cityGames := []*Game{}
 	for _, v := range this.onlineGames {
-		if v.City == cityId {
+		if cityId == -1 || v.City == cityId {
 			cityGames = append(cityGames, v)
 		}
 	}
