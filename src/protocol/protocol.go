@@ -38,7 +38,7 @@ reply2\r\n
 */
 
 type Response struct {
-	ErrNo int16
+	ReplyNo int16
 	Data  []string
 }
 
@@ -82,7 +82,7 @@ func (this *Command) Serialize() []byte {
 
 func (this *Response) Serialize() []byte {
 	buf := new(bytes.Buffer)
-	buf.WriteString(fmt.Sprintf("%d %d\r\n", this.ErrNo, len(this.Data)))
+	buf.WriteString(fmt.Sprintf("%d %d\r\n", this.ReplyNo, len(this.Data)))
 	for _, d := range this.Data {
 		buf.WriteString(fmt.Sprintf("%s\r\n", d))
 	}
@@ -91,13 +91,13 @@ func (this *Response) Serialize() []byte {
 
 func (this *Protocol) ReadResponse(reader *bufio.Reader) (*Response, error) {
 	resp := &Response{StateOK, []string{}}
-	if n, err := fmt.Fscanf(reader, "%d\r\n", &resp.ErrNo); err == io.EOF {
+	if n, err := fmt.Fscanf(reader, "%d\r\n", &resp.ReplyNo); err == io.EOF {
 		return nil, err
 	} else if n != 1 {
 		return nil, WrongFmtError
 	}
 
-	if resp.ErrNo == StateOK {
+	if resp.ReplyNo == StateOK {
 		var dataCount int
 		if n, err := fmt.Fscanf(reader, "%d\r\n", &dataCount); err == io.EOF {
 			return nil, err

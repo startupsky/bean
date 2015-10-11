@@ -5,8 +5,11 @@ import (
 )
 
 const (
-	ErrOK     = int16(0)
-	ErrFormat = int16(1)
+	ErrorReply = int16(-1)
+	LoginReply = int16(0)
+	CreategameReply = int16(1)
+	ListgameReply = int16(2)
+	JoingameReply = int16(3)
 )
 
 const (

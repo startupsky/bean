@@ -39,12 +39,11 @@ func (this *PlayerManager) Login(conn net.Conn) (player *Player, err error) {
 				this.userManager.Save()
 			}
 			
+			resp.ReplyNo = LoginReply
 			if user == nil{
-				resp.ErrNo = ErrFormat
 				resp.Data = []string{"0"}
 				conn.Write(resp.Serialize())
 			}else{
-				resp.ErrNo = ErrOK
 				resp.Data = []string{"1"}
 				if _, err := conn.Write(resp.Serialize()); err == nil {
 					player = NewPlayer(id, passwd, "dislay name", conn, this)

@@ -43,7 +43,7 @@ func (this *Player) DoWork(gameMgr *GameManager) {
 			this.handleCommand(cmd, gameMgr)
 		} else if err == protocol.WrongFmtError {
 			resp := proto.CreateResponse()
-			resp.ErrNo = ErrFormat
+			resp.ReplyNo = ErrorReply
 			if _, err := this.conn.Write(resp.Serialize()); err != nil {
 				fmt.Println(6)
 				break
@@ -77,11 +77,10 @@ func (this *Player) handleCommand(cmd *protocol.Command, gameMgr *GameManager) {
 		rect := &geo.Rectangle{MinX : minX, MinY : minY, MaxX : maxX, MaxY : maxY}
 		game := gameMgr.CreateGame(this, cmd.Arguments[0], maxPlayer, cityID, *rect)
 		
+		resp.ReplyNo = CreategameReply
 		if game == nil{
-			resp.ErrNo = ErrFormat
 			resp.Data = []string{"0"}
 		} else {
-			resp.ErrNo = ErrOK
 			resp.Data = []string{"1"}
 		}
 		this.conn.Write(resp.Serialize())
@@ -90,7 +89,7 @@ func (this *Player) handleCommand(cmd *protocol.Command, gameMgr *GameManager) {
 		cityID,_ := strconv.Atoi(cmd.Arguments[0])
 		games := gameMgr.ListGame(cityID)
 		
-		resp.ErrNo = ErrOK
+		resp.ReplyNo = ListgameReply
 		data := []string{}
 		
 		for i:=0;i<len(games);i++{
@@ -104,11 +103,10 @@ func (this *Player) handleCommand(cmd *protocol.Command, gameMgr *GameManager) {
 	if cmd.CommandID == JOINGAME && len(cmd.Arguments) == 1{
 		gameId,_ := strconv.ParseUint(cmd.Arguments[0], 10, 64)
 	 	err := gameMgr.JoinGame(this, gameId)
+		resp.ReplyNo = JoingameReply
 		if err == nil{
-			resp.ErrNo = ErrOK
 			resp.Data = []string{"0"}
 		} else {
-			resp.ErrNo = ErrFormat
 			resp.Data = []string{err.Error()}
 		}
 		this.conn.Write(resp.Serialize())

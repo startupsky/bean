@@ -7,7 +7,7 @@
         <argn>\r\n
     
     Response:
-        <errno> <return_data_count>\r\n
+        <reply> <return_data_count>\r\n
         <data1>\r\n
         ...
         <datan>\r\n
@@ -31,6 +31,13 @@
         ...
         <datan>\r\n
 
+enum reply (
+	ErrorReply = int16(-1)
+	LoginReply = int16(0)
+	CreategameReply = int16(1)
+	ListgameReply = int16(2)
+	JoingameReply = int16(3)
+)
 
 enum errno {
     OK=0,    
@@ -72,7 +79,7 @@ creategame  5\r\n
 
 
 答：
-0 1\r\n
+1 1\r\n
 1\r\n               //游戏创建成功1，失败0
 --------------------------------------------
 查询特定城市的游戏列表
@@ -80,7 +87,7 @@ listgame 1\r\n
 125\r\n     //城市ID，如果城市ID是-1，那么就是列出所有城市的游戏
 
 答：
-0 2\r\n
+2 2\r\n
 10010 李峰的游戏 114:46 114:47 3 10\r\n   //ID, 游戏名字，坐标，已经进入的人数，最大人数
 20020 杭晨的游戏 114:46 114:47 3 10\r\n
 --------------------------------------------
@@ -89,7 +96,7 @@ joingame 1\r\n
 10010\r\n
 
 答：
-0 1\r\n
+3 1\r\n
 0\r\n   //加入成功0，游戏不存在1，游戏人数满2，游戏已经开始3
 --------------------------------------------
 位置报告:
