@@ -93,7 +93,7 @@ func (this *Player) handleCommand(cmd *protocol.Command, gameMgr *GameManager) {
 		data := []string{}
 		
 		for i:=0;i<len(games);i++{
-			gamestr := fmt.Sprintf("%d %s %d:%d %d:%d %d %d", games[i].Id, games[i].Name, games[i].Rect.MinX, games[i].Rect.MinY, games[i].Rect.MaxX, games[i].Rect.MaxY, len(games[i].Players)+1, games[i].MaxPlayers)
+			gamestr := fmt.Sprintf("%d %d %s %d:%d %d:%d %d %d", games[i].Id, games[i].City, games[i].Name, games[i].Rect.MinX, games[i].Rect.MinY, games[i].Rect.MaxX, games[i].Rect.MaxY, len(games[i].Players)+1, games[i].MaxPlayers)
 			data = append(data, gamestr)
 		}
 		
