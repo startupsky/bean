@@ -3,7 +3,6 @@ package game
 import (
 	"bufio"
 	"net"
-	"strconv"
 	"util"
 	"user"
 )
@@ -27,7 +26,6 @@ func (this *PlayerManager) Login(conn net.Conn) (player *Player, err error) {
 	if cmd, err := proto.ReadCommand(bufio.NewReader(conn)); err == nil {
 		if cmd.CommandID == CMDLOGIN && len(cmd.Arguments) == 2 {
 			userid := cmd.Arguments[0]
-			id, _ := strconv.ParseUint(cmd.Arguments[0], 10, 64)
 			passwd := cmd.Arguments[1]
 
 			resp := proto.CreateResponse()
@@ -46,7 +44,7 @@ func (this *PlayerManager) Login(conn net.Conn) (player *Player, err error) {
 			}else{
 				resp.Data = []string{"1"}
 				if _, err := conn.Write(resp.Serialize()); err == nil {
-					player = NewPlayer(id, passwd, "dislay name", conn, this)
+					player = NewPlayer(userid, passwd, "dislay name", conn, this)
 					this.onlinePlayers = append(this.onlinePlayers, player)
 					return player, nil
 				}

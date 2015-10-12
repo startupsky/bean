@@ -33,7 +33,8 @@ func (this *GameManager) CreateGame(host *Player, name string, maxPlayers int, c
 	g.Rect = rect
 	g.State = gameWaiting
 
-	g.Players = map[uint64]*Player{}
+	g.Players = map[string]*Player{}
+	g.Players[host.id] = host
 	g.HostPlayer = host
 
 	this.onlineGames[g.Id] = g
@@ -54,7 +55,7 @@ func (this *GameManager) ListGame(cityId int) []*Game {
 func (this *GameManager) JoinGame(player *Player, gameId uint64) error {
 	for _, game := range this.onlineGames {
 		if game.Id == gameId {
-			if game.MaxPlayers == len(game.Players)+1 { //including host
+			if game.MaxPlayers == len(game.Players) {
 				return GamePlayersFullError
 			}
 			game.Players[player.id] = player

@@ -10,7 +10,7 @@ type Game struct {
 	City       int
 	Rect       geo.Rectangle
 	MaxPlayers int
-	Players    map[uint64]*Player
+	Players    map[string]*Player
 	HostPlayer *Player
 	State      int
 }
