@@ -40,7 +40,10 @@ func (this *Player) DoWork(gameMgr *GameManager) {
 	proto := this.parent.parent.parent.proto
 	for {
 		if cmd, err := proto.ReadCommand(reader); err == nil {
-			this.handleCommand(cmd, gameMgr)
+			logout := this.handleCommand(cmd, gameMgr)
+			if logout{
+				return
+			}
 		} else if err == protocol.WrongFmtError {
 			resp := proto.CreateResponse()
 			resp.ReplyNo = ErrorReply
@@ -60,7 +63,7 @@ func (this *Player) PostEvent(event *protocol.Event) {
 	this.eventQ <- event
 }
 
-func (this *Player) handleCommand(cmd *protocol.Command, gameMgr *GameManager) {
+func (this *Player) handleCommand(cmd *protocol.Command, gameMgr *GameManager) (logout bool) {
 	proto := gameMgr.parent.parent.proto
 	resp := proto.CreateResponse()
 	if cmd.CommandID == CREATEGAME && len(cmd.Arguments) == 5 {
@@ -84,8 +87,7 @@ func (this *Player) handleCommand(cmd *protocol.Command, gameMgr *GameManager) {
 			resp.Data = []string{"1"}
 		}
 		this.conn.Write(resp.Serialize())
-	}
-	if cmd.CommandID == LISTGAME && len(cmd.Arguments) == 1 {
+	}else if cmd.CommandID == LISTGAME && len(cmd.Arguments) == 1 {
 		cityID,_ := strconv.Atoi(cmd.Arguments[0])
 		games := gameMgr.ListGame(cityID)
 		
@@ -96,11 +98,9 @@ func (this *Player) handleCommand(cmd *protocol.Command, gameMgr *GameManager) {
 			gamestr := fmt.Sprintf("%d %d %s %d:%d %d:%d %d %d", games[i].Id, games[i].City, games[i].Name, games[i].Rect.MinX, games[i].Rect.MinY, games[i].Rect.MaxX, games[i].Rect.MaxY, len(games[i].Players)+1, games[i].MaxPlayers)
 			data = append(data, gamestr)
 		}
-		
 		resp.Data = data
 		this.conn.Write(resp.Serialize())
-	}
-	if cmd.CommandID == JOINGAME && len(cmd.Arguments) == 1{
+	}else if cmd.CommandID == JOINGAME && len(cmd.Arguments) == 1{
 		gameId,_ := strconv.ParseUint(cmd.Arguments[0], 10, 64)
 	 	err := gameMgr.JoinGame(this, gameId)
 		resp.ReplyNo = JoingameReply
@@ -110,5 +110,12 @@ func (this *Player) handleCommand(cmd *protocol.Command, gameMgr *GameManager) {
 			resp.Data = []string{err.Error()}
 		}
 		this.conn.Write(resp.Serialize())
+	}else if cmd.CommandID == LOGOUT && len(cmd.Arguments) == 0{
+		return true
+	}else{
+		resp.ReplyNo = ErrorReply
+		resp.Data = []string{"UnknownCMD"}
+		this.conn.Write(resp.Serialize())
 	}
+	return false
 }

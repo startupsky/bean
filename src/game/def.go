@@ -22,6 +22,7 @@ const (
 	CREATEGAME = "creategame"
 	LISTGAME = "listgame"
 	JOINGAME = "joingame"
+	LOGOUT = "logout"
 )
 
 type BeanError struct {
