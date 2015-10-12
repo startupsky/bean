@@ -66,56 +66,77 @@ func (this *Player) PostEvent(event *protocol.Event) {
 func (this *Player) handleCommand(cmd *protocol.Command, gameMgr *GameManager) (logout bool) {
 	proto := gameMgr.parent.parent.proto
 	resp := proto.CreateResponse()
-	if cmd.CommandID == CREATEGAME && len(cmd.Arguments) == 5 {
-		maxPlayer, _ := strconv.Atoi(cmd.Arguments[1])
-		cityID, _ := strconv.Atoi(cmd.Arguments[2])
-		topLeft := strings.Split(cmd.Arguments[3], ":")
-		minX, _ := strconv.ParseInt(topLeft[0], 10, 64)
-		minY, _ := strconv.ParseInt(topLeft[1], 10, 64)
-		
-		bottomRight := strings.Split(cmd.Arguments[4], ":")
-		maxX, _ := strconv.ParseInt(bottomRight[0], 10, 64)
-		maxY, _ := strconv.ParseInt(bottomRight[1], 10, 64)
-		
-		rect := &geo.Rectangle{MinX : minX, MinY : minY, MaxX : maxX, MaxY : maxY}
-		game := gameMgr.CreateGame(this, cmd.Arguments[0], maxPlayer, cityID, *rect)
-		
+	
+	switch cmd.CommandID{
+	case CREATEGAME:
 		resp.ReplyNo = CreategameReply
-		if game == nil{
-			resp.Data = []string{"0"}
-		} else {
+		if len(cmd.Arguments) == 5{
+			maxPlayer, _ := strconv.Atoi(cmd.Arguments[1])
+			cityID, _ := strconv.Atoi(cmd.Arguments[2])
+			topLeft := strings.Split(cmd.Arguments[3], ":")
+			minX, _ := strconv.ParseInt(topLeft[0], 10, 64)
+			minY, _ := strconv.ParseInt(topLeft[1], 10, 64)
+			
+			bottomRight := strings.Split(cmd.Arguments[4], ":")
+			maxX, _ := strconv.ParseInt(bottomRight[0], 10, 64)
+			maxY, _ := strconv.ParseInt(bottomRight[1], 10, 64)
+			
+			rect := &geo.Rectangle{MinX : minX, MinY : minY, MaxX : maxX, MaxY : maxY}
+			game := gameMgr.CreateGame(this, cmd.Arguments[0], maxPlayer, cityID, *rect)
+			
+			
+			if game == nil{
+				resp.Data = []string{"0"}
+			} else {
+				resp.Data = []string{"1"}
+			}
+		}else{
 			resp.Data = []string{"1"}
 		}
 		this.conn.Write(resp.Serialize())
-	}else if cmd.CommandID == LISTGAME && len(cmd.Arguments) == 1 {
-		cityID,_ := strconv.Atoi(cmd.Arguments[0])
-		games := gameMgr.ListGame(cityID)
-		
+	
+	case LISTGAME:
 		resp.ReplyNo = ListgameReply
-		data := []string{}
-		
-		for i:=0;i<len(games);i++{
-			gamestr := fmt.Sprintf("%d %d %s %d:%d %d:%d %d %d", games[i].Id, games[i].City, games[i].Name, games[i].Rect.MinX, games[i].Rect.MinY, games[i].Rect.MaxX, games[i].Rect.MaxY, len(games[i].Players)+1, games[i].MaxPlayers)
-			data = append(data, gamestr)
+		if len(cmd.Arguments) == 1{
+			cityID,_ := strconv.Atoi(cmd.Arguments[0])
+			games := gameMgr.ListGame(cityID)
+	
+			data := []string{}
+			
+			for i:=0;i<len(games);i++{
+				gamestr := fmt.Sprintf("%d %d %s %d:%d %d:%d %d %d", games[i].Id, games[i].City, games[i].Name, games[i].Rect.MinX, games[i].Rect.MinY, games[i].Rect.MaxX, games[i].Rect.MaxY, len(games[i].Players)+1, games[i].MaxPlayers)
+				data = append(data, gamestr)
+			}
+			resp.Data = data
+		}else{
+			resp.Data = []string{}
 		}
-		resp.Data = data
 		this.conn.Write(resp.Serialize())
-	}else if cmd.CommandID == JOINGAME && len(cmd.Arguments) == 1{
-		gameId,_ := strconv.ParseUint(cmd.Arguments[0], 10, 64)
-	 	err := gameMgr.JoinGame(this, gameId)
+	
+	case JOINGAME:
 		resp.ReplyNo = JoingameReply
-		if err == nil{
-			resp.Data = []string{"0"}
-		} else {
-			resp.Data = []string{err.Error()}
+		if len(cmd.Arguments) == 1{
+			gameId,_ := strconv.ParseUint(cmd.Arguments[0], 10, 64)
+		 	err := gameMgr.JoinGame(this, gameId)
+			
+			if err == nil{
+				resp.Data = []string{"0"}
+			} else {
+				resp.Data = []string{err.Error()}
+			}
+		}else{
+			resp.Data = []string{"1"}
 		}
+
 		this.conn.Write(resp.Serialize())
-	}else if cmd.CommandID == LOGOUT && len(cmd.Arguments) == 0{
+		
+	case LOGOUT:
 		return true
-	}else{
+	default:
 		resp.ReplyNo = ErrorReply
 		resp.Data = []string{"UnknownCMD"}
 		this.conn.Write(resp.Serialize())
 	}
+
 	return false
 }
