@@ -22,6 +22,8 @@ type Player struct {
 	state       int
 	eventQ      chan *protocol.Event
 	parent      *PlayerManager
+	X			int64
+	Y			int64
 }
 
 func NewPlayer(id string, passwd, displayName string, conn net.Conn, parent *PlayerManager) *Player {
@@ -93,7 +95,6 @@ func (this *Player) handleCommand(cmd *protocol.Command, gameMgr *GameManager) (
 		}else{
 			resp.Data = []string{"1"}
 		}
-		this.conn.Write(resp.Serialize())
 	
 	case LISTGAME:
 		resp.ReplyNo = ListgameReply
@@ -111,7 +112,6 @@ func (this *Player) handleCommand(cmd *protocol.Command, gameMgr *GameManager) (
 		}else{
 			resp.Data = []string{}
 		}
-		this.conn.Write(resp.Serialize())
 	
 	case JOINGAME:
 		resp.ReplyNo = JoingameReply
@@ -127,16 +127,44 @@ func (this *Player) handleCommand(cmd *protocol.Command, gameMgr *GameManager) (
 		}else{
 			resp.Data = []string{"1"}
 		}
-
-		this.conn.Write(resp.Serialize())
 		
+	case SHOWPLAYERS:
+		resp.ReplyNo = ShowplayersReply
+		if len(cmd.Arguments) == 1{
+			gameId,_ := strconv.ParseUint(cmd.Arguments[0], 10, 64)
+		 	game := gameMgr.onlineGames[gameId]
+			if game != nil{
+				data := []string{}
+				for _,player:=range game.Players{
+					playerStr := fmt.Sprintf("%s %s %d:%d", player.id, player.displayName, player.X, player.Y)
+					data = append(data, playerStr)
+				}
+				resp.Data = data
+			}
+		}
+		
+	case LEAVEGAME:
+		resp.ReplyNo = LeavegameReply
+		if len(cmd.Arguments) == 1{
+			gameId,_ := strconv.ParseUint(cmd.Arguments[0], 10, 64)
+			delete(gameMgr.onlineGames[gameId].Players, this.id)
+			if len(gameMgr.onlineGames[gameId].Players) == 0{
+				delete(gameMgr.onlineGames, gameId)
+			}else if gameMgr.onlineGames[gameId].HostPlayer == this{
+				for _,player:=range gameMgr.onlineGames[gameId].Players{
+					gameMgr.onlineGames[gameId].HostPlayer = player
+					break
+				}
+			}
+		}
 	case LOGOUT:
 		return true
 	default:
 		resp.ReplyNo = ErrorReply
 		resp.Data = []string{"UnknownCMD"}
-		this.conn.Write(resp.Serialize())
-	}
 
+	}
+	
+	this.conn.Write(resp.Serialize())
 	return false
 }
