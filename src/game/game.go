@@ -13,4 +13,5 @@ type Game struct {
 	Players    map[string]*Player
 	HostPlayer *Player
 	State      int
+	GameType   int
 }

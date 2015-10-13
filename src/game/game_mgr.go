@@ -24,7 +24,7 @@ func (this *GameManager) getNewId() uint64 {
 	return id
 }
 
-func (this *GameManager) CreateGame(host *Player, name string, maxPlayers int, cityId int, rect geo.Rectangle) (game *Game) {
+func (this *GameManager) CreateGame(host *Player, name string, maxPlayers int, cityId int, rect geo.Rectangle, gametype int) (game *Game) {
 	g := new(Game)
 	g.Id = this.getNewId()
 	g.Name = name
@@ -36,6 +36,7 @@ func (this *GameManager) CreateGame(host *Player, name string, maxPlayers int, c
 	g.Players = map[string]*Player{}
 	g.Players[host.id] = host
 	g.HostPlayer = host
+	g.GameType = gametype
 
 	this.onlineGames[g.Id] = g
 	return g

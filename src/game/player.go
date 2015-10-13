@@ -72,7 +72,7 @@ func (this *Player) handleCommand(cmd *protocol.Command, gameMgr *GameManager) (
 	switch cmd.CommandID{
 	case CREATEGAME:
 		resp.ReplyNo = CreategameReply
-		if len(cmd.Arguments) == 5{
+		if len(cmd.Arguments) == 6{
 			maxPlayer, _ := strconv.Atoi(cmd.Arguments[1])
 			cityID, _ := strconv.Atoi(cmd.Arguments[2])
 			topLeft := strings.Split(cmd.Arguments[3], ":")
@@ -84,7 +84,9 @@ func (this *Player) handleCommand(cmd *protocol.Command, gameMgr *GameManager) (
 			maxY, _ := strconv.ParseInt(bottomRight[1], 10, 64)
 			
 			rect := &geo.Rectangle{MinX : minX, MinY : minY, MaxX : maxX, MaxY : maxY}
-			game := gameMgr.CreateGame(this, cmd.Arguments[0], maxPlayer, cityID, *rect)
+			
+			gametype, _ := strconv.Atoi(cmd.Arguments[5]) 
+			game := gameMgr.CreateGame(this, cmd.Arguments[0], maxPlayer, cityID, *rect, gametype)
 			
 			
 			if game == nil{
@@ -105,7 +107,7 @@ func (this *Player) handleCommand(cmd *protocol.Command, gameMgr *GameManager) (
 			data := []string{}
 			
 			for i:=0;i<len(games);i++{
-				gamestr := fmt.Sprintf("%d %d %s %d:%d %d:%d %d %d", games[i].Id, games[i].City, games[i].Name, games[i].Rect.MinX, games[i].Rect.MinY, games[i].Rect.MaxX, games[i].Rect.MaxY, len(games[i].Players), games[i].MaxPlayers)
+				gamestr := fmt.Sprintf("%d %d %s %d:%d %d:%d %d %d %d", games[i].Id, games[i].City, games[i].Name, games[i].Rect.MinX, games[i].Rect.MinY, games[i].Rect.MaxX, games[i].Rect.MaxY, len(games[i].Players), games[i].MaxPlayers, games[i].GameType)
 				data = append(data, gamestr)
 			}
 			resp.Data = data
