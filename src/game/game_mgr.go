@@ -24,12 +24,12 @@ func (this *GameManager) getNewId() uint64 {
 	return id
 }
 
-func (this *GameManager) CreateGame(host *Player, name string, maxPlayers int, cityId int, rect geo.Rectangle, gametype int) (game *Game) {
+func (this *GameManager) CreateGame(host *Player, name string, maxPlayers int, city string, rect geo.Rectangle, gametype string) (game *Game) {
 	g := new(Game)
 	g.Id = this.getNewId()
 	g.Name = name
 	g.MaxPlayers = maxPlayers
-	g.City = cityId
+	g.City = city
 	g.Rect = rect
 	g.State = gameWaiting
 
@@ -42,10 +42,10 @@ func (this *GameManager) CreateGame(host *Player, name string, maxPlayers int, c
 	return g
 }
 
-func (this *GameManager) ListGame(cityId int) []*Game {
+func (this *GameManager) ListGame(city string) []*Game {
 	cityGames := []*Game{}
 	for _, v := range this.onlineGames {
-		if cityId == -1 || v.City == cityId {
+		if city == "-1" || v.City == city {
 			cityGames = append(cityGames, v)
 		}
 	}

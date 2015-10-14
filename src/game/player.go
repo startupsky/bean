@@ -74,7 +74,7 @@ func (this *Player) handleCommand(cmd *protocol.Command, gameMgr *GameManager) (
 		resp.ReplyNo = CreategameReply
 		if len(cmd.Arguments) == 6{
 			maxPlayer, _ := strconv.Atoi(cmd.Arguments[1])
-			cityID, _ := strconv.Atoi(cmd.Arguments[2])
+			city := cmd.Arguments[2]
 			topLeft := strings.Split(cmd.Arguments[3], ":")
 			minX, _ := strconv.ParseInt(topLeft[0], 10, 64)
 			minY, _ := strconv.ParseInt(topLeft[1], 10, 64)
@@ -85,8 +85,8 @@ func (this *Player) handleCommand(cmd *protocol.Command, gameMgr *GameManager) (
 			
 			rect := &geo.Rectangle{MinX : minX, MinY : minY, MaxX : maxX, MaxY : maxY}
 			
-			gametype, _ := strconv.Atoi(cmd.Arguments[5]) 
-			game := gameMgr.CreateGame(this, cmd.Arguments[0], maxPlayer, cityID, *rect, gametype)
+			gametype := cmd.Arguments[5]
+			game := gameMgr.CreateGame(this, cmd.Arguments[0], maxPlayer, city, *rect, gametype)
 			
 			
 			if game == nil{
@@ -101,13 +101,13 @@ func (this *Player) handleCommand(cmd *protocol.Command, gameMgr *GameManager) (
 	case LISTGAME:
 		resp.ReplyNo = ListgameReply
 		if len(cmd.Arguments) == 1{
-			cityID,_ := strconv.Atoi(cmd.Arguments[0])
-			games := gameMgr.ListGame(cityID)
+			city := cmd.Arguments[0]
+			games := gameMgr.ListGame(city)
 	
 			data := []string{}
 			
 			for i:=0;i<len(games);i++{
-				gamestr := fmt.Sprintf("%d %d %s %d:%d %d:%d %d %d %d", games[i].Id, games[i].City, games[i].Name, games[i].Rect.MinX, games[i].Rect.MinY, games[i].Rect.MaxX, games[i].Rect.MaxY, len(games[i].Players), games[i].MaxPlayers, games[i].GameType)
+				gamestr := fmt.Sprintf("%d %s %s %d:%d %d:%d %d %d %s", games[i].Id, games[i].City, games[i].Name, games[i].Rect.MinX, games[i].Rect.MinY, games[i].Rect.MaxX, games[i].Rect.MaxY, len(games[i].Players), games[i].MaxPlayers, games[i].GameType)
 				data = append(data, gamestr)
 			}
 			resp.Data = data

@@ -7,11 +7,11 @@ import (
 type Game struct {
 	Id         uint64
 	Name       string
-	City       int
+	City       string
 	Rect       geo.Rectangle
 	MaxPlayers int
 	Players    map[string]*Player
 	HostPlayer *Player
 	State      int
-	GameType   int
+	GameType   string
 }

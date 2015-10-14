@@ -29,11 +29,6 @@ const (
 	LEAVEGAME = "leavegame"
 )
 
-const(
-	PACMAN = 1
-	FLAG = 2
-)
-
 type BeanError struct {
 	ErrNo  int
 	ErrMsg string
