@@ -71,6 +71,7 @@ func (this *Player) handleCommand(cmd *protocol.Command, gameMgr *GameManager) (
 	
 	switch cmd.CommandID{
 	case CREATEGAME:
+		log.Debug("---creategame----\n")
 		resp.ReplyNo = CreategameReply
 		if len(cmd.Arguments) == 6{
 			maxPlayer, _ := strconv.Atoi(cmd.Arguments[1])
@@ -89,19 +90,20 @@ func (this *Player) handleCommand(cmd *protocol.Command, gameMgr *GameManager) (
 			game := gameMgr.CreateGame(this, cmd.Arguments[0], maxPlayer, city, *rect, gametype)
 			
 			if game == nil{
+				log.Debug("create game fail\n")
 				resp.Data = []string{"0"}
 			} else {
 				resp.Data = []string{"1"}
 			}
 		}else{
+			log.Debug("argument wrong\n")
 			resp.Data = []string{"1"}
 		}
 	
 	case LISTGAME:
-		resp.ReplyNo = ListgameReply
-		
 		log.Debug("---listgame----\n")
-		
+		resp.ReplyNo = ListgameReply
+	
 		if len(cmd.Arguments) == 1{
 			log.Debug(cmd.Arguments[0])
 			log.Debug("\n")
@@ -122,6 +124,7 @@ func (this *Player) handleCommand(cmd *protocol.Command, gameMgr *GameManager) (
 		}
 
 	case JOINGAME:
+		log.Debug("---joingame----\n")
 		resp.ReplyNo = JoingameReply
 		if len(cmd.Arguments) == 1{
 			gameId,_ := strconv.ParseUint(cmd.Arguments[0], 10, 64)
@@ -133,10 +136,12 @@ func (this *Player) handleCommand(cmd *protocol.Command, gameMgr *GameManager) (
 				resp.Data = []string{err.Error()}
 			}
 		}else{
-			resp.Data = []string{"1"}
+			log.Debug("argument wrong\n")
+			resp.Data = []string{"0"}
 		}
 		
 	case SHOWPLAYERS:
+		log.Debug("---showplayer----\n")
 		resp.ReplyNo = ShowplayersReply
 		if len(cmd.Arguments) == 1{
 			gameId,_ := strconv.ParseUint(cmd.Arguments[0], 10, 64)
@@ -149,9 +154,13 @@ func (this *Player) handleCommand(cmd *protocol.Command, gameMgr *GameManager) (
 				}
 				resp.Data = data
 			}
+		}else{
+			log.Debug("argument wrong\n")
+			resp.Data = []string{"0"}
 		}
 		
 	case LEAVEGAME:
+		log.Debug("---leavegame----\n")
 		resp.ReplyNo = LeavegameReply
 		if len(cmd.Arguments) == 1{
 			gameId,_ := strconv.ParseUint(cmd.Arguments[0], 10, 64)
@@ -164,10 +173,14 @@ func (this *Player) handleCommand(cmd *protocol.Command, gameMgr *GameManager) (
 					break
 				}
 			}
+		}else{
+			log.Debug("argument wrong\n")
+			resp.Data = []string{"0"}
 		}
 	case LOGOUT:
 		return true
 	default:
+		log.Debug("---unkowncommand----\n")
 		resp.ReplyNo = ErrorReply
 		resp.Data = []string{"UnknownCMD"}
 
