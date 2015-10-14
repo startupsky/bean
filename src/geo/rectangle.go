@@ -1,8 +1,8 @@
 package geo
 
 type Rectangle struct {
-	MinX int64
-	MinY int64
-	MaxX int64
-	MaxY int64
+	MinX float64
+	MinY float64
+	MaxX float64
+	MaxY float64
 }

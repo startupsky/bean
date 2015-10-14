@@ -22,8 +22,8 @@ type Player struct {
 	state       int
 	eventQ      chan *protocol.Event
 	parent      *PlayerManager
-	X			int64
-	Y			int64
+	X			float64
+	Y			float64
 }
 
 func NewPlayer(id string, passwd, displayName string, conn net.Conn, parent *PlayerManager) *Player {
@@ -76,18 +76,17 @@ func (this *Player) handleCommand(cmd *protocol.Command, gameMgr *GameManager) (
 			maxPlayer, _ := strconv.Atoi(cmd.Arguments[1])
 			city := cmd.Arguments[2]
 			topLeft := strings.Split(cmd.Arguments[3], ":")
-			minX, _ := strconv.ParseInt(topLeft[0], 10, 64)
-			minY, _ := strconv.ParseInt(topLeft[1], 10, 64)
+			minX, _ := strconv.ParseFloat(topLeft[0], 64)
+			minY, _ := strconv.ParseFloat(topLeft[1], 64)
 			
 			bottomRight := strings.Split(cmd.Arguments[4], ":")
-			maxX, _ := strconv.ParseInt(bottomRight[0], 10, 64)
-			maxY, _ := strconv.ParseInt(bottomRight[1], 10, 64)
+			maxX, _ := strconv.ParseFloat(bottomRight[0], 64)
+			maxY, _ := strconv.ParseFloat(bottomRight[1], 64)
 			
 			rect := &geo.Rectangle{MinX : minX, MinY : minY, MaxX : maxX, MaxY : maxY}
 			
 			gametype := cmd.Arguments[5]
 			game := gameMgr.CreateGame(this, cmd.Arguments[0], maxPlayer, city, *rect, gametype)
-			
 			
 			if game == nil{
 				resp.Data = []string{"0"}
@@ -107,7 +106,7 @@ func (this *Player) handleCommand(cmd *protocol.Command, gameMgr *GameManager) (
 			data := []string{}
 			
 			for i:=0;i<len(games);i++{
-				gamestr := fmt.Sprintf("%d %s %s %d:%d %d:%d %d %d %s", games[i].Id, games[i].City, games[i].Name, games[i].Rect.MinX, games[i].Rect.MinY, games[i].Rect.MaxX, games[i].Rect.MaxY, len(games[i].Players), games[i].MaxPlayers, games[i].GameType)
+				gamestr := fmt.Sprintf("%d %s %s %f:%f %f:%f %d %d %s", games[i].Id, games[i].City, games[i].Name, games[i].Rect.MinX, games[i].Rect.MinY, games[i].Rect.MaxX, games[i].Rect.MaxY, len(games[i].Players), games[i].MaxPlayers, games[i].GameType)
 				data = append(data, gamestr)
 			}
 			resp.Data = data
@@ -138,7 +137,7 @@ func (this *Player) handleCommand(cmd *protocol.Command, gameMgr *GameManager) (
 			if game != nil{
 				data := []string{}
 				for _,player:=range game.Players{
-					playerStr := fmt.Sprintf("%s %s %d:%d", player.id, player.displayName, player.X, player.Y)
+					playerStr := fmt.Sprintf("%s %s %f:%f", player.id, player.displayName, player.X, player.Y)
 					data = append(data, playerStr)
 				}
 				resp.Data = data
