@@ -56,7 +56,7 @@ func (this *GameManager) ListGame(city string) []*Game {
 func (this *GameManager) JoinGame(player *Player, gameId uint64) error {
 	for _, game := range this.onlineGames {
 		if game.Id == gameId {
-			if game.MaxPlayers == len(game.Players) {
+			if game.MaxPlayers <= len(game.Players) {
 				return GamePlayersFullError
 			}
 			game.Players[player.id] = player

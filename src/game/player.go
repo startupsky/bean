@@ -131,7 +131,7 @@ func (this *Player) handleCommand(cmd *protocol.Command, gameMgr *GameManager) (
 		 	err := gameMgr.JoinGame(this, gameId)
 			
 			if err == nil{
-				resp.Data = []string{"0"}
+				resp.Data = []string{"1"}
 			} else {
 				resp.Data = []string{err.Error()}
 			}
