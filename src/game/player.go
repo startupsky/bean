@@ -99,7 +99,13 @@ func (this *Player) handleCommand(cmd *protocol.Command, gameMgr *GameManager) (
 	
 	case LISTGAME:
 		resp.ReplyNo = ListgameReply
+		
+		log.Debug("---listgame----\n")
+		
 		if len(cmd.Arguments) == 1{
+			log.Debug(cmd.Arguments[0])
+			log.Debug("\n")
+			
 			city := cmd.Arguments[0]
 			games := gameMgr.ListGame(city)
 	
@@ -111,9 +117,10 @@ func (this *Player) handleCommand(cmd *protocol.Command, gameMgr *GameManager) (
 			}
 			resp.Data = data
 		}else{
+			log.Debug("argument wrong\n")
 			resp.Data = []string{}
 		}
-	
+
 	case JOINGAME:
 		resp.ReplyNo = JoingameReply
 		if len(cmd.Arguments) == 1{
