@@ -93,7 +93,7 @@ func (this *Player) handleCommand(cmd *protocol.Command, gameMgr *GameManager) (
 				log.Debug("create game fail\n")
 				resp.Data = []string{"0"}
 			} else {
-				resp.Data = []string{"1"}
+				resp.Data = []string{fmt.Sprintf("%d",game.Id)}
 			}
 		}else{
 			log.Debug("argument wrong\n")
