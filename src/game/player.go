@@ -181,17 +181,51 @@ func (this *Player) handleCommand(cmd *protocol.Command, gameMgr *GameManager) (
 		log.Debug("---startgame----\n")
 		resp.ReplyNo = StartgameReply
 		if len(cmd.Arguments) == 1{
-			data := []string{}
 			gameId,_ := strconv.ParseUint(cmd.Arguments[0], 10, 64)
-		 	game := gameMgr.StartGame(this, gameId)
-			if game != nil{
-				for _,point:=range game.Beans{
-					playerStr := fmt.Sprintf("%f:%f", point.X, point.Y)
-					data = append(data, playerStr)
+		 	err := gameMgr.StartGame(this, gameId)
+			if err == nil{
+				resp.Data = []string{"1"}
+			} else {
+				resp.Data = []string{err.Error()}
+			}
+		}else{
+			log.Debug("argument wrong\n")
+			resp.Data = []string{"0"}
+		}
+	case QUERYGAME:
+		log.Debug("---querygame----\n")
+		resp.ReplyNo = QuerygameReply
+		if len(cmd.Arguments) == 1{
+			gameId,_ := strconv.ParseUint(cmd.Arguments[0], 10, 64)
+		 	game := gameMgr.onlineGames[gameId]
+			if game == nil{
+				resp.Data = []string{GameNotFoundError.Error()}
+			} else {
+				resp.Data = []string{fmt.Sprintf("%d", game.State)}
+			}
+		}else{
+			log.Debug("argument wrong\n")
+			resp.Data = []string{"0"}
+		}
+	case QUERYMAP:
+		log.Debug("---querymap----\n")
+		resp.ReplyNo = QuerymapReply
+		if len(cmd.Arguments) == 1{
+			gameId,_ := strconv.ParseUint(cmd.Arguments[0], 10, 64)
+		 	game := gameMgr.onlineGames[gameId]
+			if game == nil{
+				resp.Data = []string{GameNotFoundError.Error()}
+			} else {
+				data := []string{}
+				for _,bean:=range game.Beans{
+					str := fmt.Sprintf("%f:%f 1", bean.X, bean.Y)
+					data = append(data, str)
+				}
+				for _,player:=range game.Players{
+					str := fmt.Sprintf("%f:%f 2",player.X, player.Y)
+					data = append(data, str)
 				}
 				resp.Data = data
-			} else {
-				resp.Data = []string{"0"}
 			}
 		}else{
 			log.Debug("argument wrong\n")

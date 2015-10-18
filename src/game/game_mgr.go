@@ -66,7 +66,7 @@ func (this *GameManager) JoinGame(player *Player, gameId uint64) error {
 	return GameNotFoundError
 }
 
-func (this *GameManager) StartGame(player *Player, gameId uint64) *Game {
+func (this *GameManager) StartGame(player *Player, gameId uint64) error {
 	for _, game := range this.onlineGames {
 		if game.Id == gameId {
 			game.State = gameStarted
@@ -76,8 +76,8 @@ func (this *GameManager) StartGame(player *Player, gameId uint64) *Game {
 			beans = append(beans, point)
 			game.Beans = beans
 			log.Debug("Game=%v started", player, game)
-			return game
+			return nil
 		}
 	}
-	return nil
+	return GameNotFoundError
 }

@@ -13,6 +13,8 @@ const (
 	ShowplayersReply = int16(4)
 	LeavegameReply = int16(5)
 	StartgameReply = int16(6)
+	QuerygameReply = int16(7)
+	QuerymapReply = int16(8)
 )
 
 const (
@@ -29,6 +31,8 @@ const (
 	SHOWPLAYERS = "showplayers"
 	LEAVEGAME = "leavegame"
 	STARTGAME = "startgame"
+	QUERYGAME = "querygame"
+	QUERYMAP = "querymap"
 )
 
 type BeanError struct {
