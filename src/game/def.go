@@ -12,6 +12,7 @@ const (
 	JoingameReply = int16(3)
 	ShowplayersReply = int16(4)
 	LeavegameReply = int16(5)
+	StartgameReply = int16(6)
 )
 
 const (
@@ -27,6 +28,7 @@ const (
 	LOGOUT = "logout"
 	SHOWPLAYERS = "showplayers"
 	LEAVEGAME = "leavegame"
+	STARTGAME = "startgame"
 )
 
 type BeanError struct {

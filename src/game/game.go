@@ -14,4 +14,5 @@ type Game struct {
 	HostPlayer *Player
 	State      int
 	GameType   string
+	Beans	[]*geo.Point
 }

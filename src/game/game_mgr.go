@@ -37,7 +37,6 @@ func (this *GameManager) CreateGame(host *Player, name string, maxPlayers int, c
 	g.Players[host.id] = host
 	g.HostPlayer = host
 	g.GameType = gametype
-
 	this.onlineGames[g.Id] = g
 	return g
 }
@@ -65,4 +64,20 @@ func (this *GameManager) JoinGame(player *Player, gameId uint64) error {
 		}
 	}
 	return GameNotFoundError
+}
+
+func (this *GameManager) StartGame(player *Player, gameId uint64) *Game {
+	for _, game := range this.onlineGames {
+		if game.Id == gameId {
+			game.State = gameStarted
+			//todo: set bean points
+			beans := []*geo.Point{}
+			point := &geo.Point{X : 1.1, Y : 2.2}
+			beans = append(beans, point)
+			game.Beans = beans
+			log.Debug("Game=%v started", player, game)
+			return game
+		}
+	}
+	return nil
 }

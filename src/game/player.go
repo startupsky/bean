@@ -177,6 +177,26 @@ func (this *Player) handleCommand(cmd *protocol.Command, gameMgr *GameManager) (
 			log.Debug("argument wrong\n")
 			resp.Data = []string{"0"}
 		}
+	case STARTGAME:
+		log.Debug("---startgame----\n")
+		resp.ReplyNo = StartgameReply
+		if len(cmd.Arguments) == 1{
+			data := []string{}
+			gameId,_ := strconv.ParseUint(cmd.Arguments[0], 10, 64)
+		 	game := gameMgr.StartGame(this, gameId)
+			if game != nil{
+				for _,point:=range game.Beans{
+					playerStr := fmt.Sprintf("%f:%f", point.X, point.Y)
+					data = append(data, playerStr)
+				}
+				resp.Data = data
+			} else {
+				resp.Data = []string{"0"}
+			}
+		}else{
+			log.Debug("argument wrong\n")
+			resp.Data = []string{"0"}
+		}
 	case LOGOUT:
 		return true
 	default:
