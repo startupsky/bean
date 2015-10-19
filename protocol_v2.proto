@@ -49,13 +49,40 @@ message Answer {
 }
 //================================================================================================================
 //一问一答的payload格式，c/s端可根据action字段来判定payload格式
-//查询特定城市游戏列表
+//用户登陆
 //Request:
-message ListGameRequest{
+message LoginRequest {
+    message CellLogin {
+        required uint32 cell_phone;
+        required uint32 code;
+    }
+    oneof way{
+        CellLogin   cell;
+        uint64 token;
+    } 
+    required uint32 client_proto_version;
+}
+
+//Answer:
+message LoginAnswer {
+    enum LoginErrNo{
+        OK;
+        ERRORCODE;
+        INVALIDTOKEN;
+        PROTOVERSIONTOOLOW;
+    }
+    required LoginReply errno;
+    optional uint64 token;  //return token if client use cellphone to login
+}
+//----------------------------------------------------------------------------------------------------------------
+//Query created games by city name.
+//Request:
+message ListGameRequest {
     required string city_name;
 }
+
 //Answer
-message ListGameAnswer{
+message ListGameAnswer {
     message Game{
         required uint64 id;
         required string name;
@@ -66,5 +93,18 @@ message ListGameAnswer{
     }  
     repeated Game games;
 }
+//----------------------------------------------------------------------------------------------------------------
+//Join the game
+//Request:
+message JoinRequest{
+    required uint64 game_id;
+}
+//Answer:
+message JoinAnswer {
+    enum JoinErrNo{
+        OK;
+        ERR;
+    } 
 
-//------------------------------------
+    required JoinErrNo errno;
+}
