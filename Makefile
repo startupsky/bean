@@ -12,7 +12,13 @@ dep:
 	go get github.com/nporsche/np-golang-logging
 	go get github.com/nporsche/goyaml
 
-.PHONY: clean test
+.PHONY: clean test proto
+
+proto:
+	protoc --go_out=. *.proto
+	rm -rf ./src/proto
+	-mkdir ./src/proto
+	mv bean.pb.go ./src/proto/
 
 clean:
 	rm -rf bin pkg

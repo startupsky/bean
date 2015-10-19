@@ -3,49 +3,51 @@
 //Query是客户端发给Server的查询请求。Answer是服务端发送给客户端回应，回应包含两种类型：
 //1.事件
 //2.针对客户端的请求的回答。
+syntax = "proto3";
+
 message Common {
     enum Action {
-        LOGIN;
-        LOGOUT;  
-        REPORTLOCATION;
-        CREATGAME;
-        JOINGAME;
-        CANCELGAME;  //取消一个创建的game,或者退出一个join的game.
-        LISTGAME;
-        QUIT;    //退出游戏但是保留连接
-        EXIT;    //退出游戏并释放连接
+        LOGIN = 0;
+        LOGOUT = 1;  
+        REPORTLOCATION = 2;
+        CREATGAME = 3;
+        JOINGAME = 4;
+        CANCELGAME = 5;  //取消一个创建的game,或者退出一个join的game.
+        LISTGAME = 6;
+        QUIT = 7;    //退出游戏但是保留连接
+        EXIT = 8;    //退出游戏并释放连接
     }
 
     enum EventType {
-        JOINED; 
-        CANCELLEDGAME;
+        JOINED = 0; 
+        CANCELLEDGAME = 1;
     }
 
     message Payload {
-        required bytes raw; 
+        bytes raw = 1; 
     }
 }
 
 message Query {
-    required uint64 id;
-    required Common.Action action;
-    optional Common.Payload payload;
+    uint64 id = 1;
+    Common.Action action = 2;
+    Common.Payload payload = 3;
 }
 
 message Answer {
     message Event {
-        required EventType type;
+        Common.EventType type = 1;
     }
     message Response {
-        required uint64 request_id;    
-        required Common.Action action;
+        uint64 request_id = 1;    
+        Common.Action action = 2;
     }
 
     oneof Reaction {
-        Event event;
-        Response response; 
+        Event event = 1;
+        Response response = 2; 
     }
-    optional Common.Payload payload;
+    Common.Payload payload = 3;
 }
 //================================================================================================================
 //一问一答的payload格式，c/s端可根据action字段来判定payload格式
@@ -53,58 +55,58 @@ message Answer {
 //Request:
 message LoginRequest {
     message CellLogin {
-        required uint32 cell_phone;
-        required uint32 code;
+        uint32 cell_phone = 1;
+        uint32 code = 2;
     }
     oneof way{
-        CellLogin   cell;
-        uint64 token;
+        CellLogin   cell = 1;
+        uint64 token = 2;
     } 
-    required uint32 client_proto_version;
+    uint32 client_proto_version = 3;
 }
 
 //Answer:
 message LoginAnswer {
     enum LoginErrNo{
-        OK;
-        ERRORCODE;
-        INVALIDTOKEN;
-        PROTOVERSIONTOOLOW;
+        OK = 0;
+        ERRORCODE = 1;
+        INVALIDTOKEN = 2;
+        PROTOVERSIONTOOLOW = 3;
     }
-    required LoginReply errno;
-    optional uint64 token;  //return token if client use cellphone to login
+    LoginErrNo errno = 1;
+    uint64 token = 2;  //return token if client use cellphone to login
 }
 //----------------------------------------------------------------------------------------------------------------
 //Query created games by city name.
 //Request:
 message ListGameRequest {
-    required string city_name;
+    string city_name = 1;
 }
 
 //Answer
 message ListGameAnswer {
     message Game{
-        required uint64 id;
-        required string name;
-        required uint32 longitude;
-        required uint32 latitude;
-        required uint32 nplayer;
-        required uint32 max_nplayer;
+        uint64 id = 1;
+        string name = 2;
+        uint32 longitude = 3;
+        uint32 latitude = 4;
+        uint32 nplayer = 5;
+        uint32 max_nplayer = 6;
     }  
-    repeated Game games;
+    repeated Game games = 1;
 }
 //----------------------------------------------------------------------------------------------------------------
 //Join the game
 //Request:
 message JoinRequest{
-    required uint64 game_id;
+    uint64 game_id = 1;
 }
 //Answer:
 message JoinAnswer {
     enum JoinErrNo{
-        OK;
-        ERR;
+        OK = 0;
+        ERR = 1;
     } 
 
-    required JoinErrNo errno;
+    JoinErrNo errno = 1;
 }
