@@ -1,0 +1,70 @@
+//v2版本采用google protocol buffer来描述游戏通信协议
+//================================================================================================================
+//Query是客户端发给Server的查询请求。Answer是服务端发送给客户端回应，回应包含两种类型：
+//1.事件
+//2.针对客户端的请求的回答。
+message Common {
+    enum Action {
+        LOGIN;
+        LOGOUT;  
+        REPORTLOCATION;
+        CREATGAME;
+        JOINGAME;
+        CANCELGAME;  //取消一个创建的game,或者退出一个join的game.
+        LISTGAME;
+        QUIT;    //退出游戏但是保留连接
+        EXIT;    //退出游戏并释放连接
+    }
+
+    enum EventType {
+        JOINED; 
+        CANCELLEDGAME;
+    }
+
+    message Payload {
+        required bytes raw; 
+    }
+}
+
+message Query {
+    required uint64 id;
+    required Common.Action action;
+    optional Common.Payload payload;
+}
+
+message Answer {
+    message Event {
+        required EventType type;
+    }
+    message Response {
+        required uint64 request_id;    
+        required Common.Action action;
+    }
+
+    oneof Reaction {
+        Event event;
+        Response response; 
+    }
+    optional Common.Payload payload;
+}
+//================================================================================================================
+//一问一答的payload格式，c/s端可根据action字段来判定payload格式
+//查询特定城市游戏列表
+//Request:
+message ListGameRequest{
+    required string city_name;
+}
+//Answer
+message ListGameAnswer{
+    message Game{
+        required uint64 id;
+        required string name;
+        required uint32 longitude;
+        required uint32 latitude;
+        required uint32 nplayer;
+        required uint32 max_nplayer;
+    }  
+    repeated Game games;
+}
+
+//------------------------------------
