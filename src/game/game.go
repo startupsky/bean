@@ -16,3 +16,38 @@ type Game struct {
 	GameType   string
 	Beans	[]*geo.Point
 }
+
+func (this *Game) getXRange() (float64,float64){
+	if this.Rect.MinX > this.Rect.MaxX{
+		return this.Rect.MaxX, this.Rect.MinX
+	}
+	return this.Rect.MinX, this.Rect.MaxX
+}
+
+func (this *Game) getYRange() (float64,float64){
+	if this.Rect.MinY > this.Rect.MaxY{
+		return this.Rect.MaxY, this.Rect.MinY
+	}
+	return this.Rect.MinY, this.Rect.MaxY
+}
+
+func (this *Game) SetupMap() {
+	
+	startX, stopX := this.getXRange()
+	startY, stopY := this.getYRange()
+	
+	distanceX := (stopX - startX)/10.0
+	distanceY := (stopY - startY)/10.0
+	
+	beans := []*geo.Point{}
+	
+	if distanceX > 0 && distanceY > 0{
+		for i := startX; i < stopX; i += distanceX {
+			for j:= startY; j < stopY; j += distanceY {
+				point := &geo.Point{X : i, Y : j}
+				beans = append(beans, point)			
+			}
+		}
+	}
+	this.Beans = beans
+}

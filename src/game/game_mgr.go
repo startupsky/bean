@@ -70,11 +70,7 @@ func (this *GameManager) StartGame(player *Player, gameId uint64) error {
 	for _, game := range this.onlineGames {
 		if game.Id == gameId {
 			game.State = gameStarted
-			//todo: set bean points
-			beans := []*geo.Point{}
-			point := &geo.Point{X : 1.1, Y : 2.2}
-			beans = append(beans, point)
-			game.Beans = beans
+			game.SetupMap()
 			log.Debug("Game=%v started", player, game)
 			return nil
 		}
