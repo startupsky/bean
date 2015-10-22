@@ -24,6 +24,7 @@ type Player struct {
 	parent      *PlayerManager
 	X			float64
 	Y			float64
+	game 		*Game
 }
 
 func NewPlayer(id string, passwd, displayName string, conn net.Conn, parent *PlayerManager) *Player {
@@ -68,7 +69,6 @@ func (this *Player) PostEvent(event *protocol.Event) {
 func (this *Player) handleCommand(cmd *protocol.Command, gameMgr *GameManager) (logout bool) {
 	proto := gameMgr.parent.parent.proto
 	resp := proto.CreateResponse()
-	
 	switch cmd.CommandID{
 	case CREATEGAME:
 		log.Debug("---creategame----\n")
@@ -93,6 +93,7 @@ func (this *Player) handleCommand(cmd *protocol.Command, gameMgr *GameManager) (
 				log.Debug("create game fail\n")
 				resp.Data = []string{"0"}
 			} else {
+				this.game = game
 				resp.Data = []string{fmt.Sprintf("%d",game.Id)}
 			}
 		}else{
@@ -132,6 +133,7 @@ func (this *Player) handleCommand(cmd *protocol.Command, gameMgr *GameManager) (
 			
 			if err == nil{
 				resp.Data = []string{"1"}
+				this.game = gameMgr.onlineGames[gameId]
 			} else {
 				resp.Data = []string{err.Error()}
 			}
@@ -162,17 +164,17 @@ func (this *Player) handleCommand(cmd *protocol.Command, gameMgr *GameManager) (
 	case LEAVEGAME:
 		log.Debug("---leavegame----\n")
 		resp.ReplyNo = LeavegameReply
-		if len(cmd.Arguments) == 1{
-			gameId,_ := strconv.ParseUint(cmd.Arguments[0], 10, 64)
-			delete(gameMgr.onlineGames[gameId].Players, this.id)
-			if len(gameMgr.onlineGames[gameId].Players) == 0{
-				delete(gameMgr.onlineGames, gameId)
-			}else if gameMgr.onlineGames[gameId].HostPlayer == this{
-				for _,player:=range gameMgr.onlineGames[gameId].Players{
-					gameMgr.onlineGames[gameId].HostPlayer = player
+		if this.game != nil && len(cmd.Arguments) == 0{
+			delete(gameMgr.onlineGames[this.game.Id].Players, this.id)
+			if len(gameMgr.onlineGames[this.game.Id].Players) == 0{
+				delete(gameMgr.onlineGames, this.game.Id)
+			}else if gameMgr.onlineGames[this.game.Id].HostPlayer == this{
+				for _,player:=range gameMgr.onlineGames[this.game.Id].Players{
+					gameMgr.onlineGames[this.game.Id].HostPlayer = player
 					break
 				}
 			}
+			this.game = nil
 		}else{
 			log.Debug("argument wrong\n")
 			resp.Data = []string{"0"}
@@ -180,9 +182,8 @@ func (this *Player) handleCommand(cmd *protocol.Command, gameMgr *GameManager) (
 	case STARTGAME:
 		log.Debug("---startgame----\n")
 		resp.ReplyNo = StartgameReply
-		if len(cmd.Arguments) == 1{
-			gameId,_ := strconv.ParseUint(cmd.Arguments[0], 10, 64)
-		 	err := gameMgr.StartGame(this, gameId)
+		if this.game != nil && len(cmd.Arguments) == 0{
+		 	err := gameMgr.StartGame(this, this.game.Id)
 			if err == nil{
 				resp.Data = []string{"1"}
 			} else {
