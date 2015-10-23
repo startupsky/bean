@@ -8,6 +8,9 @@ type Rectangle struct {
 }
 
 type Point struct {
+	RowIndex int
+	ColumnIndex int
 	X float64
 	Y float64
+	Role int  //-1 means empty, 1 means bean
 }

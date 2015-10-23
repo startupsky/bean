@@ -219,11 +219,13 @@ func (this *Player) handleCommand(cmd *protocol.Command, gameMgr *GameManager) (
 			} else {
 				data := []string{}
 				for _,bean:=range game.Beans{
-					str := fmt.Sprintf("%f:%f 1", bean.X, bean.Y)
-					data = append(data, str)
+					if bean.Role != -1{
+						str := fmt.Sprintf("%d:%d %f:%f 1 bean", bean.RowIndex, bean.ColumnIndex, bean.X, bean.Y)
+						data = append(data, str)
+					}
 				}
 				for _,player:=range game.Players{
-					str := fmt.Sprintf("%f:%f 2",player.X, player.Y)
+					str := fmt.Sprintf("%d:%d %f:%f 2 %s", -1, -1, player.X, player.Y, player.id)
 					data = append(data, str)
 				}
 				resp.Data = data

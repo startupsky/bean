@@ -15,6 +15,8 @@ type Game struct {
 	State      int
 	GameType   string
 	Beans	[]*geo.Point
+	Row			int
+	Column		int
 }
 
 func (this *Game) getXRange() (float64,float64){
@@ -41,13 +43,31 @@ func (this *Game) SetupMap() {
 	
 	beans := []*geo.Point{}
 	
-	if distanceX > 0 && distanceY > 0{
-		for i := startX; i < stopX; i += distanceX {
-			for j:= startY; j < stopY; j += distanceY {
-				point := &geo.Point{X : i, Y : j}
-				beans = append(beans, point)			
-			}
+	this.Row = (int) ((stopY-startY)/distanceY)
+	this.Column = (int) ((stopX - startX)/distanceX)
+	
+	for i := 0; i < this.Row; i++{
+		for j:=0;j<this.Column;j++{
+			pointX := startX + 0.5*distanceX + float64(i)*distanceX
+			pointY := startY + 0.5*distanceY + float64(j)*distanceY
+			point := &geo.Point{RowIndex: i, ColumnIndex: j, X : pointX, Y : pointY, Role:1}
+			beans = append(beans, point)	
 		}
+	}
+	
+	for _,player:=range this.Players{
+		beansIndex :=0
+		if player.X > startX && player.X < stopX && player.Y > startY && player.Y < stopY{
+			playerRow := int( (player.X - startX)/distanceX)
+			playerColumn := int( (player.Y - startY)/distanceY)
+			beansIndex = playerRow*this.Column + playerColumn
+		}
+		for beans[beansIndex].Role == -1{
+			beansIndex = (beansIndex+1)%(this.Row*this.Column)
+		}
+		player.X = beans[beansIndex].X
+		player.Y = beans[beansIndex].Y
+		beans[beansIndex].Role = -1
 	}
 	this.Beans = beans
 }
