@@ -44,7 +44,7 @@ func (this *PlayerManager) Login(conn net.Conn) (player *Player, err error) {
 			}else{
 				resp.Data = []string{"1"}
 				if _, err := conn.Write(resp.Serialize()); err == nil {
-					player = NewPlayer(userid, passwd, "dislayname", conn, this)
+					player = NewPlayer(userid, passwd, userid, conn, this)
 					this.onlinePlayers = append(this.onlinePlayers, player)
 					return player, nil
 				}

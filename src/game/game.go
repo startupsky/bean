@@ -71,3 +71,23 @@ func (this *Game) SetupMap() {
 	}
 	this.Beans = beans
 }
+
+func (this *Game) UpdateMap(X float64, Y float64) (score int) {
+	distanceX := 0.5/11000.0 // 0.5m
+	distanceY := distanceX	
+	score = 0
+	for _,bean:=range this.Beans{
+		if bean.Role == 1{
+			startX := bean.X - distanceX
+			stopX := bean.X + distanceX
+			startY := bean.Y - distanceY
+			stopY := bean.Y + distanceY
+			
+			if X > startX && X < stopX && Y > startY && Y < stopY{
+				bean.Role = -1
+				score = score+1
+			}			
+		}
+	}
+	return score
+}

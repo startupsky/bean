@@ -15,11 +15,14 @@ const (
 	StartgameReply = int16(6)
 	QuerygameReply = int16(7)
 	QuerymapReply = int16(8)
+	ReportReply = int16(9)
+	StopgameReply = int16(10)
 )
 
 const (
 	gameWaiting = iota
 	gameStarted
+	gameStopped
 )
 
 const (
@@ -33,6 +36,8 @@ const (
 	STARTGAME = "startgame"
 	QUERYGAME = "querygame"
 	QUERYMAP = "querymap"
+	REPORT = "report"
+	STOPGAME = "stopgame"
 )
 
 type BeanError struct {

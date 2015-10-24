@@ -8,6 +8,7 @@ import (
 	"strconv"
 	"strings"
 	"geo"
+	"sort"
 )
 
 const (
@@ -25,7 +26,28 @@ type Player struct {
 	X			float64
 	Y			float64
 	game 		*Game
+	currentScore int
+	totalScore	int
 }
+
+type PlayerList []*Player  
+func (list PlayerList) Len() int { 
+    return len(list) 
+} 
+func (list PlayerList) Less(i, j int) bool { 
+    if list[i].currentScore < list[j].currentScore { 
+        return true 
+    } else if list[i].currentScore > list[j].currentScore { 
+        return false 
+    } else { 
+        return list[i].id < list[j].id 
+    } 
+} 
+func (list PlayerList) Swap(i, j int) { 
+    var temp *Player = list[i] 
+    list[i] = list[j] 
+    list[j] = temp 
+} 
 
 func NewPlayer(id string, passwd, displayName string, conn net.Conn, parent *PlayerManager) *Player {
 	this := new(Player)
@@ -94,6 +116,7 @@ func (this *Player) handleCommand(cmd *protocol.Command, gameMgr *GameManager) (
 				resp.Data = []string{"0"}
 			} else {
 				this.game = game
+				this.currentScore = 0
 				resp.Data = []string{fmt.Sprintf("%d",game.Id)}
 			}
 		}else{
@@ -134,6 +157,7 @@ func (this *Player) handleCommand(cmd *protocol.Command, gameMgr *GameManager) (
 			if err == nil{
 				resp.Data = []string{"1"}
 				this.game = gameMgr.onlineGames[gameId]
+				this.currentScore = 0
 			} else {
 				resp.Data = []string{err.Error()}
 			}
@@ -175,6 +199,7 @@ func (this *Player) handleCommand(cmd *protocol.Command, gameMgr *GameManager) (
 				}
 			}
 			this.game = nil
+			this.currentScore = 0
 		}else{
 			log.Debug("argument wrong\n")
 			resp.Data = []string{"0"}
@@ -218,22 +243,66 @@ func (this *Player) handleCommand(cmd *protocol.Command, gameMgr *GameManager) (
 				resp.Data = []string{GameNotFoundError.Error()}
 			} else {
 				data := []string{}
-				for _,bean:=range game.Beans{
-					if bean.Role != -1{
-						str := fmt.Sprintf("%d:%d %f:%f 1 bean", bean.RowIndex, bean.ColumnIndex, bean.X, bean.Y)
+				data = append(data, fmt.Sprintf("%d", game.State))
+				if game.State == gameStarted{
+					data = append(data, fmt.Sprintf("%d %d", game.Row, game.Column))
+					for _,bean:=range game.Beans{
+						str := fmt.Sprintf("1 %d:%d %f:%f %d", bean.RowIndex, bean.ColumnIndex, bean.X, bean.Y, bean.Role)
+						data = append(data, str)
+					}
+					for _,player:=range game.Players{
+						str := fmt.Sprintf("2 %f:%f %s %d", player.X, player.Y, player.displayName, player.currentScore)
+						data = append(data, str)
+					}
+				}else if game.State == gameStopped{
+					var plist PlayerList
+					for _,player:=range game.Players{
+						plist = append(plist, player)
+					}
+					sort.Sort(plist,)
+					for i:=plist.Len()-1;i>=0;i--{
+						str := fmt.Sprintf("%s %d", plist[i].displayName, plist[i].currentScore)
+						data = append(data, str)
+					}
+				}else if game.State == gameWaiting{
+					for _,player:=range game.Players{
+						str := fmt.Sprintf("%s %f:%f", player.displayName, player.X, player.Y)
 						data = append(data, str)
 					}
 				}
-				for _,player:=range game.Players{
-					str := fmt.Sprintf("%d:%d %f:%f 2 %s", -1, -1, player.X, player.Y, player.id)
-					data = append(data, str)
-				}
+
 				resp.Data = data
 			}
 		}else{
 			log.Debug("argument wrong\n")
 			resp.Data = []string{"0"}
 		}
+		
+	case REPORT:
+		log.Debug("---report----\n")
+		resp.ReplyNo = ReportReply
+		if len(cmd.Arguments) == 1 && this.game!= nil {
+			location := strings.Split(cmd.Arguments[0], ":")
+			X, _ := strconv.ParseFloat(location[0], 64)
+			Y, _ := strconv.ParseFloat(location[1], 64)		
+			this.X = X
+			this.Y = Y		
+			if this.game.State == gameStarted{
+				newScore := this.game.UpdateMap(X,Y)
+				this.currentScore += newScore
+				this.totalScore += newScore
+			}
+		}
+	case STOPGAME:
+		log.Debug("---stopgame----\n")
+		resp.ReplyNo = StopgameReply
+		if len(cmd.Arguments) == 0 && this.game!= nil && this.game.State == gameStarted{
+			this.game.State = gameStopped
+			resp.Data = []string{"1"}
+		}else{
+			resp.Data = []string{"0"}
+		}
+		
 	case LOGOUT:
 		return true
 	default:
