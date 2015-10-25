@@ -112,7 +112,7 @@ func (this *Player) handleCommand(cmd *protocol.Command, gameMgr *GameManager) (
 			game := gameMgr.CreateGame(this, cmd.Arguments[0], maxPlayer, city, *rect, gametype)
 			
 			if game == nil{
-				log.Debug("create game fail\n")
+				log.Debug("create game fail")
 				resp.Data = []string{"0"}
 			} else {
 				this.game = game
@@ -120,7 +120,7 @@ func (this *Player) handleCommand(cmd *protocol.Command, gameMgr *GameManager) (
 				resp.Data = []string{fmt.Sprintf("%d",game.Id)}
 			}
 		}else{
-			log.Debug("argument wrong\n")
+			log.Debug("argument wrong")
 			resp.Data = []string{"1"}
 		}
 	
@@ -129,7 +129,6 @@ func (this *Player) handleCommand(cmd *protocol.Command, gameMgr *GameManager) (
 	
 		if len(cmd.Arguments) == 1{
 			log.Debug(cmd.Arguments[0])
-			log.Debug("\n")
 			
 			city := cmd.Arguments[0]
 			games := gameMgr.ListGame(city)
@@ -142,7 +141,7 @@ func (this *Player) handleCommand(cmd *protocol.Command, gameMgr *GameManager) (
 			}
 			resp.Data = data
 		}else{
-			log.Debug("argument wrong\n")
+			log.Debug("argument wrong")
 			resp.Data = []string{}
 		}
 
@@ -160,7 +159,7 @@ func (this *Player) handleCommand(cmd *protocol.Command, gameMgr *GameManager) (
 				resp.Data = []string{err.Error()}
 			}
 		}else{
-			log.Debug("argument wrong\n")
+			log.Debug("argument wrong")
 			resp.Data = []string{"0"}
 		}
 		
@@ -178,7 +177,7 @@ func (this *Player) handleCommand(cmd *protocol.Command, gameMgr *GameManager) (
 				resp.Data = data
 			}
 		}else{
-			log.Debug("argument wrong\n")
+			log.Debug("argument wrong")
 			resp.Data = []string{"0"}
 		}
 		
@@ -197,7 +196,7 @@ func (this *Player) handleCommand(cmd *protocol.Command, gameMgr *GameManager) (
 			this.game = nil
 			this.currentScore = 0
 		}else{
-			log.Debug("argument wrong\n")
+			log.Debug("argument wrong")
 			resp.Data = []string{"0"}
 		}
 	case STARTGAME:
@@ -210,7 +209,7 @@ func (this *Player) handleCommand(cmd *protocol.Command, gameMgr *GameManager) (
 				resp.Data = []string{err.Error()}
 			}
 		}else{
-			log.Debug("argument wrong\n")
+			log.Debug("argument wrong")
 			resp.Data = []string{"0"}
 		}
 	case QUERYGAME:
@@ -224,7 +223,7 @@ func (this *Player) handleCommand(cmd *protocol.Command, gameMgr *GameManager) (
 				resp.Data = []string{fmt.Sprintf("%d", game.State)}
 			}
 		}else{
-			log.Debug("argument wrong\n")
+			log.Debug("argument wrong")
 			resp.Data = []string{"0"}
 		}
 	case QUERYMAP:
@@ -292,7 +291,7 @@ func (this *Player) handleCommand(cmd *protocol.Command, gameMgr *GameManager) (
 				resp.Data = data
 			}
 		}else{
-			log.Debug("argument wrong\n")
+			log.Debug("argument wrong")
 			resp.Data = []string{"0"}
 		}
 		
@@ -322,7 +321,7 @@ func (this *Player) handleCommand(cmd *protocol.Command, gameMgr *GameManager) (
 	case LOGOUT:
 		return true
 	default:
-		log.Debug("---unkowncommand----\n")
+		log.Debug("---unkowncommand----")
 		resp.ReplyNo = ErrorReply
 		resp.Data = []string{"UnknownCMD"}
 
@@ -333,10 +332,10 @@ func (this *Player) handleCommand(cmd *protocol.Command, gameMgr *GameManager) (
 }
 
 func (this *Player) logCommand(cmd *protocol.Command) {
-	str := fmt.Sprintf("Commmand ID: [%s], User: [%s]\r\nCommand Argument: ", cmd.CommandID, this.id)
+	log.Debug(fmt.Sprintf("Commmand ID: [%s], User: [%s]", cmd.CommandID, this.id))
+	str := "Command Argument: "
 	for i:=0;i<len(cmd.Arguments);i++ {
 		str += fmt.Sprintf("[%s], ", cmd.Arguments[i])
 	}
-	str += "\r\n"
 	log.Debug(str)
 }
