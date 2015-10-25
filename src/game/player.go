@@ -246,10 +246,35 @@ func (this *Player) handleCommand(cmd *protocol.Command, gameMgr *GameManager) (
 				data = append(data, fmt.Sprintf("%d", game.State))
 				if game.State == gameStarted{
 					data = append(data, fmt.Sprintf("%d %d", game.Row, game.Column))
-					for _,bean:=range game.Beans{
+					//workaround the message too long issue, send multi response here.
+					resp1 := proto.CreateResponse()
+					resp1.ReplyNo = QuerymapReply
+					data1 := []string{}
+					data1 = append(data1, fmt.Sprintf("%d", game.State))
+					data1 = append(data1, fmt.Sprintf("%d %d", game.Row, game.Column))
+					needSend := false
+					for i:=0;i<len(game.Beans);i++{
+						needSend = true
+						bean := game.Beans[i]
 						str := fmt.Sprintf("1 %d:%d %f:%f %d", bean.RowIndex, bean.ColumnIndex, bean.X, bean.Y, bean.Role)
-						data = append(data, str)
+						data1 = append(data1, str)
+						if (i+1)%40 == 0{
+							resp1.Data = data1
+							this.conn.Write(resp1.Serialize())
+							
+							resp1 = proto.CreateResponse()
+							resp1.ReplyNo = QuerymapReply
+							data1 = []string{}
+							data1 = append(data1, fmt.Sprintf("%d", game.State))
+							data1 = append(data1, fmt.Sprintf("%d %d", game.Row, game.Column))
+							needSend = false
+						}
 					}
+					if needSend{
+						resp1.Data = data1
+						this.conn.Write(resp1.Serialize())
+					}
+
 					for _,player:=range game.Players{
 						str := fmt.Sprintf("2 %f:%f %s %d", player.X, player.Y, player.displayName, player.currentScore)
 						data = append(data, str)
