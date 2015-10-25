@@ -39,7 +39,7 @@ func (this *Game) SetupMap() {
 	startX, stopX := this.getXRange()
 	startY, stopY := this.getYRange()
 	
-	distanceX := 10/11000.0 // 1m
+	distanceX := 2/11000.0 // 2m
 	distanceY := distanceX
 	
 	beans := []*geo.Point{}
