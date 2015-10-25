@@ -89,11 +89,11 @@ func (this *Player) PostEvent(event *protocol.Event) {
 }
 
 func (this *Player) handleCommand(cmd *protocol.Command, gameMgr *GameManager) (logout bool) {
+	this.logCommand(cmd)
 	proto := gameMgr.parent.parent.proto
 	resp := proto.CreateResponse()
 	switch cmd.CommandID{
 	case CREATEGAME:
-		log.Debug("---creategame----\n")
 		resp.ReplyNo = CreategameReply
 		if len(cmd.Arguments) == 6{
 			maxPlayer, _ := strconv.Atoi(cmd.Arguments[1])
@@ -125,7 +125,6 @@ func (this *Player) handleCommand(cmd *protocol.Command, gameMgr *GameManager) (
 		}
 	
 	case LISTGAME:
-		log.Debug("---listgame----\n")
 		resp.ReplyNo = ListgameReply
 	
 		if len(cmd.Arguments) == 1{
@@ -148,7 +147,6 @@ func (this *Player) handleCommand(cmd *protocol.Command, gameMgr *GameManager) (
 		}
 
 	case JOINGAME:
-		log.Debug("---joingame----\n")
 		resp.ReplyNo = JoingameReply
 		if len(cmd.Arguments) == 1{
 			gameId,_ := strconv.ParseUint(cmd.Arguments[0], 10, 64)
@@ -167,7 +165,6 @@ func (this *Player) handleCommand(cmd *protocol.Command, gameMgr *GameManager) (
 		}
 		
 	case SHOWPLAYERS:
-		log.Debug("---showplayer----\n")
 		resp.ReplyNo = ShowplayersReply
 		if len(cmd.Arguments) == 1{
 			gameId,_ := strconv.ParseUint(cmd.Arguments[0], 10, 64)
@@ -186,7 +183,6 @@ func (this *Player) handleCommand(cmd *protocol.Command, gameMgr *GameManager) (
 		}
 		
 	case LEAVEGAME:
-		log.Debug("---leavegame----\n")
 		resp.ReplyNo = LeavegameReply
 		if this.game != nil && len(cmd.Arguments) == 0{
 			delete(gameMgr.onlineGames[this.game.Id].Players, this.id)
@@ -205,7 +201,6 @@ func (this *Player) handleCommand(cmd *protocol.Command, gameMgr *GameManager) (
 			resp.Data = []string{"0"}
 		}
 	case STARTGAME:
-		log.Debug("---startgame----\n")
 		resp.ReplyNo = StartgameReply
 		if this.game != nil && len(cmd.Arguments) == 0{
 		 	err := gameMgr.StartGame(this, this.game.Id)
@@ -219,7 +214,6 @@ func (this *Player) handleCommand(cmd *protocol.Command, gameMgr *GameManager) (
 			resp.Data = []string{"0"}
 		}
 	case QUERYGAME:
-		log.Debug("---querygame----\n")
 		resp.ReplyNo = QuerygameReply
 		if len(cmd.Arguments) == 1{
 			gameId,_ := strconv.ParseUint(cmd.Arguments[0], 10, 64)
@@ -234,7 +228,6 @@ func (this *Player) handleCommand(cmd *protocol.Command, gameMgr *GameManager) (
 			resp.Data = []string{"0"}
 		}
 	case QUERYMAP:
-		log.Debug("---querymap----\n")
 		resp.ReplyNo = QuerymapReply
 		if len(cmd.Arguments) == 1{
 			gameId,_ := strconv.ParseUint(cmd.Arguments[0], 10, 64)
@@ -304,7 +297,6 @@ func (this *Player) handleCommand(cmd *protocol.Command, gameMgr *GameManager) (
 		}
 		
 	case REPORT:
-		log.Debug("---report----\n")
 		resp.ReplyNo = ReportReply
 		if len(cmd.Arguments) == 1 && this.game!= nil {
 			location := strings.Split(cmd.Arguments[0], ":")
@@ -319,7 +311,6 @@ func (this *Player) handleCommand(cmd *protocol.Command, gameMgr *GameManager) (
 			}
 		}
 	case STOPGAME:
-		log.Debug("---stopgame----\n")
 		resp.ReplyNo = StopgameReply
 		if len(cmd.Arguments) == 0 && this.game!= nil && this.game.State == gameStarted{
 			this.game.State = gameStopped
@@ -339,4 +330,13 @@ func (this *Player) handleCommand(cmd *protocol.Command, gameMgr *GameManager) (
 	
 	this.conn.Write(resp.Serialize())
 	return false
+}
+
+func (this *Player) logCommand(cmd *protocol.Command) {
+	str := fmt.Sprintf("Commmand ID: [%s], User: [%s]\r\nCommand Argument: ", cmd.CommandID, this.id)
+	for i:=0;i<len(cmd.Arguments);i++ {
+		str += fmt.Sprintf("[%s], ", cmd.Arguments[i])
+	}
+	str += "\r\n"
+	log.Debug(str)
 }

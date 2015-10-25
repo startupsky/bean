@@ -2,6 +2,7 @@ package game
 
 import (
 	"geo"
+	"fmt"
 )
 
 type Game struct {
@@ -84,6 +85,7 @@ func (this *Game) UpdateMap(X float64, Y float64) (score int) {
 			stopY := bean.Y + distanceY
 			
 			if X > startX && X < stopX && Y > startY && Y < stopY{
+				log.Debug(fmt.Sprintf("UpdateMap: eat [%f]:[%f]", bean.X, bean.Y))
 				bean.Role = -1
 				score = score+1
 			}			
