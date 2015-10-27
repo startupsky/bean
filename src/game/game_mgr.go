@@ -71,7 +71,6 @@ func (this *GameManager) StartGame(player *Player, gameId uint64) error {
 		if game.Id == gameId {
 			game.State = gameStarted
 			game.SetupMap()
-			log.Debug("Game=%v started", player, game)
 			return nil
 		}
 	}
