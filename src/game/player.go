@@ -268,7 +268,7 @@ func (this *Player) handleCommand(cmd *protocol.Command, gameMgr *GameManager) (
 					}
 
 					for _,player:=range game.Players{
-						str := fmt.Sprintf("2 %f:%f %s %d", player.X, player.Y, player.displayName, player.currentScore)
+						str := fmt.Sprintf("2 %f:%f %s %s %d", player.X, player.Y, player.displayName, "pacman", player.currentScore)
 						data = append(data, str)
 					}
 				}else if game.State == gameStopped{
