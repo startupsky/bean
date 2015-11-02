@@ -250,7 +250,11 @@ func (this *Player) handleCommand(cmd *protocol.Command, gameMgr *GameManager) (
 						bean := game.Beans[i]
 						str := fmt.Sprintf("1 %d:%d %f:%f %d", bean.RowIndex, bean.ColumnIndex, bean.X, bean.Y, bean.Role)
 						data1 = append(data1, str)
-						if (i+1)%40 == 0{
+						if (i+1)%30 == 0{
+							for _,player:=range game.Players{
+								data1 = append(data1, fmt.Sprintf("2 %f:%f %s %s %d", player.X, player.Y, player.displayName, "pacman", player.currentScore))
+							}
+					
 							resp1.Data = data1
 							this.conn.Write(resp1.Serialize())
 							
